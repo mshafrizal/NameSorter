@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Name Sorter</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="node_modules/file-saver/src/FileSaver.js"></script>
+</head>
+<body>
+    <h1>Name Sorter</h1>
+    <h4>Muhammad Shafrizal</h4>
+    <h4>mshafrizal@gmail.com</h4>
+    <br>
+
+    <input type="file" onchange="readInput(this)">
+    
+    <h4>Input Result</h4>
+    <pre id="input-result"></pre>
+    <button onclick="sortNames()">Sort</button>
+    
+    <h4>Sorted Result</h4>
+    <pre id="sorted-result"></pre>
+    <button type="button" onclick="saveSortedNames()" >Click to Save</button>
+
+    <script>
+        var reader = new FileReader();//buat objek filereader
+        var names=[];//buat objek untuk tampung nama
+        var sortedNames=[];
+        function readInput(input){
+            let file = input.files[0];//pilih file yg diinput
+
+            reader.readAsText(file);//baca user input
+
+            reader.onload = function() {
+                let lines = this.result.split('\r\n');//split new line
+                document.getElementById("input-result").textContent = reader.result;
+                for(let line = 0; line < lines.length; line++){
+                    names.push(lines[line]);//masukkan ke array setiap baris
+                }
+            };        
+            reader.onerror = function() {
+                document.getElementById("input-result").textContent = "Terjadi Kesalahan";
+            };
+        }
+        function sortNames(){
+            //simpan ke variable sortedNames
+            sortedNames = names.sort(compare).join('\r\n');//replace comma, should use \r\n, \n will skip the first array, didn't know why
+            document.getElementById('sorted-result').textContent = sortedNames;
+        }
+        function compare(a,b){
+            //split spasi
+            let aName = a.split(' ');
+            let bName = b.split(' ');
+
+            //declare kata terakhir
+            let aLastName = aName[aName.length-1];
+            let bLastName = bName[bName.length-1];
+
+            //jika nilai a kurang dari b then swap, else do nothing
+            if(aLastName<bLastName) return -1;
+            if(aLastName>bLastName) return 1;
+            
+            return 0;
+        }
+        //using filesaver library to save file
+        function saveSortedNames(){
+            var blob = new Blob([sortedNames]);
+            saveAs(blob, "sorted-names-list.txt");
+        }
+    </script>
+</body>
+</html>
